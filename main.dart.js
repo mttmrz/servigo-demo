@@ -117190,12 +117190,12 @@ case 1:return A.t(p.at(-1),r)}})
 return A.v($async$BL,r)}}
 A.aDr.prototype={
 $0(){var s=this.a
-s.Q=A.b(["Florence","Rome","Milan","Naples","Turin","Venice","Bologna","Palermo","Genoa","Bari","Catania","Verona","Messina","Padua","Trieste","Brescia","Taranto","Prato","Modena","Reggio Calabria","Reggio Emilia","Perugia","Livorno"],t.s)
+s.Q=A.b(["Florence","Rome","Milan","Naples","Turin","Venice","Bologna"],t.s)
 s.as=!1},
 $S:0}
 A.aDs.prototype={
 $0(){var s=this.a
-s.Q=A.b(["Florence","Rome","Milan","Naples","Turin"],t.s)
+s.Q=A.b(["Florence","Rome","Milan","Naples","Turin","Venice","Bologna"],t.s)
 s.as=!1},
 $S:0}
 A.aDt.prototype={
