@@ -15,96 +15,112 @@
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
 
-    html {
-      width: 100%;
-      height: 100%;
+    body {
       background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      overflow: hidden;
     }
-    html::before {
+    body::before {
       content: '';
       position: fixed;
       inset: 0;
       background-image: radial-gradient(circle, rgba(255,255,255,0.04) 1px, transparent 1px);
       background-size: 28px 28px;
       pointer-events: none;
-      z-index: 0;
     }
 
-    /* Flutter renders inside body — body is the phone screen */
-    body {
-      width: 393px;
-      height: 852px;
-      position: fixed;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      overflow: hidden;
-      background: #fff;
-      /* Massive box-shadow blacks out everything outside the phone screen */
-      box-shadow:
-        0 0 0 9999px rgba(12, 18, 40, 0.94),
-        0 32px 80px rgba(0,0,0,0.9),
-        0 0 80px rgba(0,80,255,0.12);
-    }
-
-    /* Phone bezel — decorative overlay, never captures pointer events */
-    #phone-bezel {
-      position: fixed;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      width: 393px;
-      height: 852px;
-      pointer-events: none;
-      z-index: 9999;
-      border-radius: 54px;
-      box-shadow:
-        inset 0 0 0 1px rgba(255,255,255,0.10),
-        0 0 0 1.5px #3a3a3c,
-        0 0 0 3.5px #1c1c1e,
-        0 0 0 5px #3a3a3c;
-    }
-
-    /* Dynamic Island */
-    #phone-bezel::after {
-      content: '';
-      position: absolute;
-      top: 12px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 120px;
-      height: 34px;
-      background: #000;
-      border-radius: 20px;
-    }
-
-    /* Side buttons */
-    .btn { position: absolute; background: #3a3a3c; }
-    .btn-silent  { left: -5px; top: 162px; width: 5px; height: 32px; border-radius: 3px 0 0 3px; }
-    .btn-vol-up  { left: -5px; top: 212px; width: 5px; height: 62px; border-radius: 3px 0 0 3px; }
-    .btn-vol-dn  { left: -5px; top: 286px; width: 5px; height: 62px; border-radius: 3px 0 0 3px; }
-    .btn-power   { right: -5px; top: 230px; width: 5px; height: 90px; border-radius: 0 3px 3px 0; }
-
-    /* Labels */
-    #servigo-label {
-      position: fixed;
-      top: calc(50% - 452px - 28px);
-      left: 50%;
-      transform: translateX(-50%);
+    .label {
       color: rgba(255,255,255,0.4);
       font-size: 11px;
       letter-spacing: 2.5px;
       text-transform: uppercase;
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-      pointer-events: none;
-      z-index: 9999;
-      white-space: nowrap;
     }
-    #demo-badge {
-      position: fixed;
-      top: calc(50% + 452px + 16px);
+
+    /* Phone shell — sized with CSS vars so we can scale without transform */
+    .phone {
+      --ph: min(852px, 90vh);
+      --pw: calc(var(--ph) * 393 / 852);
+      position: relative;
+      width: var(--pw);
+      height: var(--ph);
+      background: #1c1c1e;
+      border-radius: calc(54px * var(--ph) / 852);
+      box-shadow:
+        0 0 0 1px #3a3a3c,
+        0 0 0 3px #1c1c1e,
+        0 0 0 5px #3a3a3c,
+        0 24px 70px rgba(0,0,0,0.85),
+        0 0 50px rgba(0,80,255,0.08);
+      flex-shrink: 0;
+    }
+
+    /* Left side buttons */
+    .phone::before {
+      content: '';
+      position: absolute;
+      left: -5px;
+      top: calc(var(--ph) * 162 / 852);
+      width: 5px;
+      height: calc(var(--ph) * 32 / 852);
+      background: #3a3a3c;
+      border-radius: 3px 0 0 3px;
+      box-shadow:
+        0 calc(var(--ph) * 50 / 852) 0 #3a3a3c,
+        0 calc(var(--ph) * 124 / 852) 0 #3a3a3c;
+    }
+    /* Right button */
+    .phone::after {
+      content: '';
+      position: absolute;
+      right: -5px;
+      top: calc(var(--ph) * 230 / 852);
+      width: 5px;
+      height: calc(var(--ph) * 90 / 852);
+      background: #3a3a3c;
+      border-radius: 0 3px 3px 0;
+    }
+
+    .screen {
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      overflow: hidden;
+    }
+
+    /* Dynamic Island */
+    .dynamic-island {
+      position: absolute;
+      top: calc(var(--ph) * 12 / 852);
       left: 50%;
       transform: translateX(-50%);
+      width: calc(var(--pw) * 120 / 393);
+      height: calc(var(--ph) * 34 / 852);
+      background: #000;
+      border-radius: 20px;
+      z-index: 10;
+      pointer-events: none;
+    }
+
+    iframe {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      border: none;
+      /* Force crisp rendering — avoids subpixel blur */
+      image-rendering: -webkit-optimize-contrast;
+      image-rendering: crisp-edges;
+      transform: translateZ(0);
+      backface-visibility: hidden;
+    }
+
+    .demo-badge {
       display: flex;
       align-items: center;
       gap: 6px;
@@ -114,16 +130,11 @@
       padding: 6px 14px;
       color: rgba(255,255,255,0.5);
       font-size: 12px;
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-      pointer-events: none;
-      z-index: 9999;
-      white-space: nowrap;
     }
     .dot {
       width: 6px; height: 6px;
       background: #34d399;
       border-radius: 50%;
-      flex-shrink: 0;
       animation: pulse 2s infinite;
     }
     @keyframes pulse {
@@ -131,34 +142,27 @@
       50% { opacity: 0.3; }
     }
 
-    /* Real mobile: full screen, no chrome */
+    /* Real mobile: full screen */
     @media (max-width: 500px) {
-      html { background: #fff; }
-      html::before { display: none; }
-      body {
-        width: 100vw;
-        height: 100%;
-        position: static;
-        transform: none;
-        box-shadow: none;
-      }
-      #phone-bezel, #demo-badge, #servigo-label { display: none; }
+      body { background: #fff; gap: 0; }
+      body::before { display: none; }
+      .phone { --ph: 100vh; --pw: 100vw; border-radius: 0; box-shadow: none; }
+      .phone::before, .phone::after { display: none; }
+      .label, .demo-badge, .dynamic-island { display: none; }
     }
   </style>
 </head>
 <body>
-  <script src="flutter_bootstrap.js" async></script>
+  <span class="label">Servigo</span>
+  <div class="phone">
+    <div class="screen">
+      <div class="dynamic-island"></div>
+      <iframe src="app.html"></iframe>
+    </div>
+  </div>
+  <div class="demo-badge">
+    <span class="dot"></span>
+    Live demo &middot; Supabase backend
+  </div>
 </body>
-
-<div id="phone-bezel">
-  <div class="btn btn-silent"></div>
-  <div class="btn btn-vol-up"></div>
-  <div class="btn btn-vol-dn"></div>
-  <div class="btn btn-power"></div>
-</div>
-<div id="servigo-label">Servigo</div>
-<div id="demo-badge">
-  <span class="dot"></span>
-  Live demo &middot; Supabase backend
-</div>
 </html>
